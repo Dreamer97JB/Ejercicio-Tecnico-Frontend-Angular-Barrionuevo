@@ -11,11 +11,12 @@ import { ProductService } from '../../../core/services/product.service';
 import { FinancialProduct } from '../../../core/models/financial-product.model';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { ConfirmDeleteModalComponent } from "../../../shared/components/confirm-delete-modal.component";
 
 @Component({
   standalone: true,
   selector: 'app-product-list',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, ConfirmDeleteModalComponent],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.scss'],
 })
@@ -23,6 +24,11 @@ export class ProductListComponent implements OnInit {
   allProducts: FinancialProduct[] = [];
   filteredProducts: FinancialProduct[] = [];
   loading = true;
+
+  //modal de borrado
+  selectedProductId: string | null = null;
+  selectedProductName: string | null = null;
+  showDeleteModal = false;
 
   // búsqueda de producto
   filterTerm = '';
@@ -80,25 +86,32 @@ export class ProductListComponent implements OnInit {
     this.router.navigate(['/editar', id]);
   }
 
-  onDelete(id: string): void {
-    const confirmed = confirm(`¿Estás seguro de eliminar el producto con ID "${id}"?`);
-    if (!confirmed) return;
+  onDelete(id: string, name: string): void {
+    this.selectedProductId = id;
+    this.selectedProductName = name;
+    this.showDeleteModal = true;
+  }
 
-    this.productService.deleteProduct(id).subscribe({
-      next: (res) => {
-        console.log('Producto eliminado:', res.message);
-
-        // Remove from both arrays
-        this.allProducts = this.allProducts.filter(p => p.id !== id);
-        this.filteredProducts = this.filteredProducts.filter(p => p.id !== id);
-
-        // Close menu
+  confirmDelete(): void {
+    if (!this.selectedProductId) return;
+    this.productService.deleteProduct(this.selectedProductId).subscribe({
+      next: () => {
+        this.filteredProducts = this.filteredProducts.filter(p => p.id !== this.selectedProductId);
+        this.allProducts = this.allProducts.filter(p => p.id !== this.selectedProductId);
+        this.showDeleteModal = false;
         this.menuOpenId = null;
       },
       error: (err) => {
-        alert('Error al eliminar producto: ' + err.message);
+        alert('Error eliminando producto: ' + err.message);
       }
     });
+  }
+
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.selectedProductId = null;
+    this.selectedProductName = null;
   }
 
   onSearchChange(): void {

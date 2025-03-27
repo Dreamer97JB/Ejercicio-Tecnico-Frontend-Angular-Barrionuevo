@@ -52,7 +52,7 @@
         <button (click)="toggleMenu(product.id)">⋮</button>
         <div *ngIf="isMenuOpen(product.id)" #menuRef class="contextual-menu">
           <button (click)="onEdit(product.id)">Editar</button>
-          <button (click)="onDelete(product.id)">Eliminar</button>
+          <button (click)="onDelete(product.id, product.name)">Eliminar</button>
         </div>
       </td>
 
@@ -69,3 +69,12 @@
 <div *ngIf="!loading && filteredProducts.length === 0">
   <p>No hay productos disponibles.</p>
 </div>
+
+
+
+<app-confirm-delete-modal
+  [visible]="showDeleteModal"
+  [productName]="selectedProductName"
+  (confirm)="confirmDelete()"
+  (cancelDelete)="cancelDelete()"
+></app-confirm-delete-modal>

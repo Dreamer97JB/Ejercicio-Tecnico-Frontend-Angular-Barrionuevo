@@ -1,0 +1,9 @@
+<div *ngIf="visible" class="modal-overlay">
+  <div class="modal-content">
+    <p>¿Estás seguro de eliminar el producto <strong>{{ productName }}</strong>?</p>
+    <div class="modal-actions">
+      <button (click)="onCancel()">Cancelar</button>
+      <button (click)="onConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>
