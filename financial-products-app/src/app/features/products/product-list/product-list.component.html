@@ -1,81 +1,79 @@
-<h2>Listado de Productos Financieros</h2>
+<div class="list-container">
+  <div class="header-bar">
+    <input
+      type="text"
+      [(ngModel)]="filterTerm"
+      (input)="onSearchChange()"
+      placeholder="Search..."
+      class="search-input"
+    />
+    <button routerLink="/add" class="add-button">Agregar</button>
+  </div>
 
-<button routerLink="/add" class="add-button">➕ Agregar Producto</button>
+  <div *ngIf="loading">
+    <p>Cargando productos...</p>
+  </div>
 
-<div class="search-wrapper">
-  <input
-    type="text"
-    [(ngModel)]="filterTerm"
-    (input)="onSearchChange()"
-    placeholder="Buscar producto financiero por nombre..."
-  />
+  <table *ngIf="!loading && filteredProducts.length > 0" class="product-table">
+    <thead>
+      <tr>
+        <th>Logo</th>
+        <th>Nombre del producto</th>
+        <th>Descripción <span class="info-icon">ℹ️</span></th>
+        <th>Fecha de liberación <span class="info-icon">ℹ️</span></th>
+        <th>Fecha de reestructuración <span class="info-icon">ℹ️</span></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let product of paginatedProducts">
+        <td>
+          <img [src]="product.logo" alt="Logo" class="product-logo" />
+        </td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.description }}</td>
+        <td>{{ product.date_release }}</td>
+        <td>{{ product.date_revision }}</td>
+        <td class="menu-wrapper">
+          <button (click)="toggleMenu(product.id)" class="menu-button">⋮</button>
+          <div *ngIf="isMenuOpen(product.id)" class="contextual-menu">
+            <button (click)="onEdit(product.id)">Editar</button>
+            <button (click)="onDelete(product.id, product.name)">Eliminar</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="totalResults > pageSize" class="pagination-wrapper">
+    <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1" class="pagination-icon">
+      ‹
+    </button>
+    <span>Página {{ currentPage }}</span>
+    <button (click)="currentPage = currentPage + 1" [disabled]="(currentPage * pageSize) >= totalResults" class="pagination-icon">
+      ›
+    </button>
+  </div>
+
+  <p class="results-count">{{ filteredProducts.length }} Resultados</p>
+
+  <div class="page-size-selector">
+    <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+      <option [value]="5">5</option>
+      <option [value]="10">10</option>
+      <option [value]="20">20</option>
+    </select>
+  </div>
+
+  <div *ngIf="!loading && filteredProducts.length === 0">
+    <p>No hay productos disponibles.</p>
+  </div>
+
+  <app-confirm-delete-modal
+    *ngIf="showDeleteModal"
+    [visible]="true"
+    [productName]="selectedProductName"
+    (confirm)="confirmDelete()"
+    (cancelDelete)="cancelDelete()"
+  ></app-confirm-delete-modal>
 </div>
-
-<div *ngIf="loading">
-  <p>Cargando productos...</p> <!-- Replace later with skeleton -->
-</div>
-
-<div class="pagination-header">
-  <p>Mostrando {{ paginatedProducts.length }} de {{ totalResults }} resultados</p>
-
-  <label for="pageSize">Registros por página:</label>
-  <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-    <option [value]="5">5</option>
-    <option [value]="10">10</option>
-    <option [value]="20">20</option>
-  </select>
-</div>
-
-<table *ngIf="!loading && filteredProducts.length > 0">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nombre</th>
-      <th>Descripción</th>
-      <th>Logo</th>
-      <th>Fecha de Liberación</th>
-      <th>Fecha de Revisión</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let product of paginatedProducts">
-      <td>{{ product.id }}</td>
-      <td>{{ product.name }}</td>
-      <td>{{ product.description }}</td>
-      <td>
-        <img [src]="product.logo" alt="Logo" width="100" />
-      </td>
-      <td>{{ product.date_release }}</td>
-      <td>{{ product.date_revision }}</td>
-
-      <td>
-        <button (click)="toggleMenu(product.id)">⋮</button>
-        <div *ngIf="isMenuOpen(product.id)" #menuRef class="contextual-menu">
-          <button (click)="onEdit(product.id)">Editar</button>
-          <button (click)="onDelete(product.id, product.name)">Eliminar</button>
-        </div>
-      </td>
-
-    </tr>
-  </tbody>
-</table>
-
-<div *ngIf="totalResults > pageSize" class="pagination-controls">
-  <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
-  <span>Página {{ currentPage }}</span>
-  <button (click)="currentPage = currentPage + 1" [disabled]="(currentPage * pageSize) >= totalResults">Siguiente</button>
-</div>
-
-<div *ngIf="!loading && filteredProducts.length === 0">
-  <p>No hay productos disponibles.</p>
-</div>
-
-
-
-<app-confirm-delete-modal
-   *ngIf="showDeleteModal"
-  [visible]="true"
-  [productName]="selectedProductName"
-  (confirm)="confirmDelete()"
-  (cancelDelete)="cancelDelete()"
-></app-confirm-delete-modal>
