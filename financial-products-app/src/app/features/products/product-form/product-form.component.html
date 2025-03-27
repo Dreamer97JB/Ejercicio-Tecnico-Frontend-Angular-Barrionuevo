@@ -2,7 +2,8 @@
 
 <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
   <div *ngFor="let field of ['id', 'name', 'description', 'logo', 'date_release', 'date_revision']">
-    <label [for]="field">{{ field.replace('_', ' ') | titlecase }}</label>
+    <label [for]="field">{{ fieldLabels[field] }}</label>
+
 
     <ng-container [ngSwitch]="field">
 
@@ -21,7 +22,7 @@
     [type]="field.includes('date') ? 'date' : 'text'"
     [formControlName]="field"
     [id]="field"
-    [attr.placeholder]="field.replace('_', ' ')"
+    [attr.placeholder]="fieldplaceholderLabels[field]"
   />
 </ng-container>
 
@@ -44,12 +45,14 @@
 
 
 
-  <button type="submit" [disabled]="productForm.invalid" class="full-width">
-    {{ isEditMode ? 'Guardar' : 'Agregar' }}
-  </button>
-
-  <button type="button" (click)="onReset()" class="full-width">
+  <div class="button-row">
+  <button type="button" (click)="onReset()">
     {{ isEditMode ? 'Cancelar' : 'Reiniciar' }}
   </button>
+
+  <button type="submit" [disabled]="productForm.invalid">
+    {{ isEditMode ? 'Guardar' : 'Agregar' }}
+  </button>
+</div>
 
 </form>

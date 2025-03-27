@@ -82,7 +82,50 @@ form {
     cursor: not-allowed;
   }
 
-  .full-width {
-    grid-column: span 2;
-  }
+        .button-row {
+          grid-column: span 2;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 1rem;
+
+          button {
+            width: 140px;
+            padding: 10px 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+          }
+
+          button[type='submit'] {
+            background-color: #ffec9f;
+            color: #333;
+            justify-self: start;
+          }
+
+          button[type='button'] {
+            background-color: #e3e4f1;
+            color: #333;
+            justify-self: end;
+          }
+
+          /* Alineación interna para que parezcan centrados */
+          &>button:first-child {
+            margin-left: auto;
+            margin-right: 1rem;
+          }
+
+          &>button:last-child {
+            margin-right: auto;
+            margin-left: 1rem;
+          }
+
+          button[disabled] {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
 }

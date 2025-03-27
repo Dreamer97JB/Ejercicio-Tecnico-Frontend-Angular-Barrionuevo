@@ -26,6 +26,25 @@ export class ProductFormComponent implements OnInit {
   isEditMode = false;
   productId: string | null = null;
 
+  fieldLabels: Record<string, string> = {
+    id: 'Identificador',
+    name: 'Nombre del Producto',
+    description: 'Descripción',
+    logo: 'Logo (URL)',
+    date_release: 'Fecha de Liberación',
+    date_revision: 'Fecha de Revisión'
+  };
+
+  fieldplaceholderLabels: Record<string, string> = {
+    id: 'Identificador',
+    name: 'Nombre del Producto',
+    description: 'Descripción',
+    logo: 'Logo (URL)',
+    date_release: 'Fecha de Liberación',
+    date_revision: 'Fecha de Revisión'
+  };
+
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
