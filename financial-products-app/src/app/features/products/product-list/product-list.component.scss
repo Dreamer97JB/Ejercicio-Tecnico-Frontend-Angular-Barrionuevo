@@ -1,8 +1,39 @@
 .list-container {
-  padding: 1.5rem;
+  max-width: auto;
+  margin: 0 auto;
+  padding: 2rem;
   background-color: #f8f9fc;
   border-radius: 8px;
   font-family: 'Montserrat', sans-serif;
+}
+
+
+.custom-info-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 4px;
+}
+
+.header-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+}
+
+.menu-button {
+  font-size: 22px;
+  font-weight: bold;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #eaeaea;
+  }
 }
 
 .header-bar {
@@ -15,7 +46,7 @@
     padding: 10px 12px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    width: 60%;
+    width: 20%;
     font-size: 14px;
   }
 
@@ -31,9 +62,10 @@
 }
 
 .product-table {
+  font-size: 13px;
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
+  background-color: #fff;
   border-radius: 8px;
   overflow: hidden;
 
@@ -72,38 +104,65 @@
   }
 }
 
+.product-table thead th:first-child {
+  text-align: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.product-table td:first-child {
+  text-align: center;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+/* Menú contextual para Editar/Eliminar */
 .contextual-menu {
   position: absolute;
   right: 0;
   top: 2.5rem;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 0.5rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  padding: 0.25rem 0;
   z-index: 10;
+  width: 160px;
 
   button {
-    display: block;
-    background: none;
-    border: none;
-    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     width: 100%;
-    text-align: left;
+    padding: 0.75rem 1rem;
+    background: transparent;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    color: #333;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    .material-symbols-outlined {
+      font-size: 18px;
+      color: #616161;
+    }
 
     &:hover {
-      background-color: #f1f1f1;
+      background-color: #f7f7f7;
+
+      .material-symbols-outlined {
+        color: #000;
+      }
     }
   }
 }
 
+/* Paginación centrada y con íconos */
 .pagination-wrapper {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin-top: 1.5rem;
 
   .pagination-icon {
     background: none;
@@ -118,17 +177,22 @@
   }
 }
 
-.results-count {
-  margin-top: 0.5rem;
-  text-align: left;
-  font-size: 14px;
+/* Bloque de resultados, paginación y select en la misma línea */
+.bottom-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 1rem;
 }
 
-.page-size-selector {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
+/* Texto con cantidad de resultados */
+.results-count {
+  font-size: 14px;
+  font-weight: bolder;
+}
 
+/* Selector de cantidad de registros a la derecha */
+.page-size-selector {
   select {
     padding: 6px 10px;
     font-size: 14px;

@@ -83,10 +83,12 @@ export class ProductListComponent implements OnInit {
   }
 
   onEdit(id: string): void {
+    this.menuOpenId = null;
     this.router.navigate(['/editar', id]);
   }
 
   onDelete(id: string, name: string): void {
+    this.menuOpenId = null;
     this.selectedProductId = id;
     this.selectedProductName = name;
     this.showDeleteModal = true;
