@@ -18,12 +18,12 @@ export class ProductService {
     );
   }
 
-  createProduct(product: FinancialProduct): Observable<any> {
-    return this.http.post(this.baseUrl, product);
+  createProduct(product: FinancialProduct): Observable<{ message: string; data: FinancialProduct }> {
+    return this.http.post<{ message: string; data: FinancialProduct }>(this.baseUrl, product);
   }
 
   verifyId(id: string): Observable<boolean> {
     return this.http.get<boolean>(`${this.baseUrl}/verification/${id}`);
   }
-  
+
 }

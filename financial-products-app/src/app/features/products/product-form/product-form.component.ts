@@ -112,7 +112,8 @@ export class ProductFormComponent {
       return;
     }
 
-    const product = this.productForm.value;
+    const product = this.productForm.getRawValue();
+    console.log(JSON.stringify(product, null, 2));
     this.productService.createProduct(product).subscribe({
       next: () => this.router.navigate(['/']),
       error: (err: ApiError) => alert('Error al agregar producto: ' + err.message)
