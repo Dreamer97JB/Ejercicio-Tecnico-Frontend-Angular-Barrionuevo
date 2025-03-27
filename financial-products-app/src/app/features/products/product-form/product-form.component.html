@@ -1,1 +1,47 @@
-<p>product-form works!</p>
+<h2>Agregar Producto</h2>
+
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <div *ngFor="let field of ['id', 'name', 'description', 'logo', 'date_release', 'date_revision']">
+    <label [for]="field">{{ field.replace('_', ' ') | titlecase }}</label>
+
+    <ng-container [ngSwitch]="field">
+
+  <!-- Special case: Revision Date (disabled input) -->
+  <input
+    *ngSwitchCase="'date_revision'"
+    type="date"
+    [formControlName]="field"
+    [id]="field"
+    [disabled]="true"
+  />
+
+  <!-- Regular case -->
+  <input
+    *ngSwitchDefault
+    [type]="field.includes('date') ? 'date' : 'text'"
+    [formControlName]="field"
+    [id]="field"
+    [attr.placeholder]="field.replace('_', ' ')"
+  />
+</ng-container>
+
+    <!-- Validation Errors -->
+    <div *ngIf="productForm.get(field)?.invalid && (productForm.get(field)?.touched || productForm.get(field)?.dirty)">
+      <small *ngIf="productForm.get(field)?.errors?.['required']">Este campo es requerido.</small>
+      <small *ngIf="productForm.get(field)?.errors?.['minlength']">
+        Mínimo {{ productForm.get(field)?.errors?.['minlength'].requiredLength }} caracteres.
+      </small>
+      <small *ngIf="productForm.get(field)?.errors?.['maxlength']">
+        Máximo {{ productForm.get(field)?.errors?.['maxlength'].requiredLength }} caracteres.
+      </small>
+      <small *ngIf="productForm.get(field)?.errors?.['minDate']">Debe ser hoy o una fecha futura.</small>
+      <small *ngIf="productForm.get(field)?.errors?.['notOneYearAfter']">
+        La fecha debe ser exactamente un año después de la fecha de liberación.
+      </small>
+      <small *ngIf="productForm.get(field)?.errors?.['idTaken']">Este ID ya está en uso.</small>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="productForm.invalid">Agregar</button>
+  <button type="button" (click)="onReset()">Reiniciar</button>
+</form>

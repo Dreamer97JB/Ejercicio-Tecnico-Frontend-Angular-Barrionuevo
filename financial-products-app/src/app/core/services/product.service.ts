@@ -17,4 +17,13 @@ export class ProductService {
       map(response => response.data)
     );
   }
+
+  createProduct(product: FinancialProduct): Observable<any> {
+    return this.http.post(this.baseUrl, product);
+  }
+
+  verifyId(id: string): Observable<boolean> {
+    return this.http.get<boolean>(`${this.baseUrl}/verification/${id}`);
+  }
+  
 }
