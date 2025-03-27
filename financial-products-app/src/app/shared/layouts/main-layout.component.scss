@@ -31,9 +31,15 @@
 
 .content-wrapper {
   flex: 1;
-  max-width: 1000px;
-  margin: 40px auto;
-  padding: 32px;
   width: 100%;
   background-color: #0063f7;
+  padding: 40px 0;
+}
+
+.inner-content {
+  max-width: auto;
+  margin: 10 auto;
+  background-color: #e91b1b;
+  border-radius: 8px;
+  padding: 2rem;
 }
