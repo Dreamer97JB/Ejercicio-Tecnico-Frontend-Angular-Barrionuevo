@@ -1,9 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  HostListener,
+  ViewChildren,
+  ElementRef,
+  QueryList,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../core/services/product.service';
 import { FinancialProduct } from '../../../core/models/financial-product.model';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -17,14 +24,21 @@ export class ProductListComponent implements OnInit {
   filteredProducts: FinancialProduct[] = [];
   loading = true;
 
-  //búsqueda de producto
+  // búsqueda de producto
   filterTerm = '';
 
-  //paginación
+  // paginación
   pageSize = 5;
   currentPage = 1;
 
-  constructor(private productService: ProductService) { }
+  // contextual menu
+  menuOpenId: string | null = null;
+  @ViewChildren('menuRef') menus!: QueryList<ElementRef>;
+
+  constructor(
+    private productService: ProductService,
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe({
@@ -38,6 +52,36 @@ export class ProductListComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  toggleMenu(id: string): void {
+    this.menuOpenId = this.menuOpenId === id ? null : id;
+  }
+
+  isMenuOpen(id: string): boolean {
+    return this.menuOpenId === id;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const clickedInside = this.menus?.some((menu) =>
+      menu.nativeElement.contains(target)
+    );
+
+    const clickedToggle = target.closest('button');
+
+    if (!clickedInside && !clickedToggle) {
+      this.menuOpenId = null;
+    }
+  }
+
+  onEdit(id: string): void {
+    this.router.navigate(['/editar', id]);
+  }
+
+  onDelete(id: string): void {
+    console.warn(`Simulación: producto con ID '${id}' eliminado`);
   }
 
   onSearchChange(): void {
@@ -61,5 +105,4 @@ export class ProductListComponent implements OnInit {
   get totalResults(): number {
     return this.filteredProducts.length;
   }
-
 }

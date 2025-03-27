@@ -47,6 +47,19 @@
       </td>
       <td>{{ product.date_release }}</td>
       <td>{{ product.date_revision }}</td>
+
+      <td>
+        <button (click)="toggleMenu(product.id)">⋮</button>
+        <div
+          *ngIf="isMenuOpen(product.id)"
+          #menuRef
+          class="context-menu"
+        >
+          <button (click)="onEdit(product.id)">Editar</button>
+          <button (click)="onDelete(product.id)">Eliminar</button>
+        </div>
+      </td>
+
     </tr>
   </tbody>
 </table>
