@@ -73,7 +73,8 @@
 
 
 <app-confirm-delete-modal
-  [visible]="showDeleteModal"
+   *ngIf="showDeleteModal"
+  [visible]="true"
   [productName]="selectedProductName"
   (confirm)="confirmDelete()"
   (cancelDelete)="cancelDelete()"
