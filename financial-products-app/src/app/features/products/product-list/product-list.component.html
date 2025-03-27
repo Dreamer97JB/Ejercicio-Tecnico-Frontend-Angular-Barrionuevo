@@ -50,11 +50,7 @@
 
       <td>
         <button (click)="toggleMenu(product.id)">⋮</button>
-        <div
-          *ngIf="isMenuOpen(product.id)"
-          #menuRef
-          class="context-menu"
-        >
+        <div *ngIf="isMenuOpen(product.id)" #menuRef class="contextual-menu">
           <button (click)="onEdit(product.id)">Editar</button>
           <button (click)="onDelete(product.id)">Eliminar</button>
         </div>
