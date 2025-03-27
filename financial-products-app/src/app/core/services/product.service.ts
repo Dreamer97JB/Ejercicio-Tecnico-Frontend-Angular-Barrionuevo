@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { FinancialProduct } from '../models/financial-product.model';
 
 @Injectable({
@@ -19,8 +19,8 @@ export class ProductService {
   }
 
   getProductById(id: string): Observable<FinancialProduct> {
-    return this.http.get<{ data: FinancialProduct }>(`${this.baseUrl}/${id}`).pipe(
-      map(response => response.data)
+    return this.http.get<FinancialProduct>(`${this.baseUrl}/${id}`).pipe(
+      tap(product => console.log('GET /products/:id response:', product))
     );
   }
 

@@ -1,4 +1,4 @@
-<h2>Agregar Producto</h2>
+  <h2>{{ isEditMode ? 'Editar Producto' : 'Agregar Producto' }}</h2>
 
 <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
   <div *ngFor="let field of ['id', 'name', 'description', 'logo', 'date_release', 'date_revision']">
@@ -42,6 +42,13 @@
     </div>
   </div>
 
-  <button type="submit" [disabled]="productForm.invalid">Agregar</button>
-  <button type="button" (click)="onReset()">Reiniciar</button>
+
+
+  <button type="submit" [disabled]="productForm.invalid">
+  {{ isEditMode ? 'Guardar' : 'Agregar' }}
+  </button>
+
+  <button type="button" (click)="onReset()">
+    {{ isEditMode ? 'Cancelar' : 'Reiniciar' }}
+  </button>
 </form>

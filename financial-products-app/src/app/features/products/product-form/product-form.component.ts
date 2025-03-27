@@ -74,16 +74,26 @@ export class ProductFormComponent implements OnInit {
 
       this.productService.getProductById(this.productId).subscribe({
         next: (product) => {
-          this.productForm.patchValue(product);
-          this.productForm.get('id')?.disable(); 
+          console.log('Producto cargado para edición:', product);
+
+          const formattedProduct = {
+            ...product,
+            date_release: this.formatDateToInput(product.date_release),
+            date_revision: this.formatDateToInput(product.date_revision),
+          };
+
+          this.productForm.get('id')?.enable();
+          this.productForm.patchValue(formattedProduct);
+          this.productForm.get('id')?.disable();
         },
         error: (err) => {
-          alert('No se pudo cargar el producto para edición: ' + err.message);
+          alert('No se pudo cargar el producto: ' + err.message);
           this.router.navigate(['/']);
         }
       });
     }
   }
+
 
   onSubmit() {
     if (this.productForm.invalid) {
@@ -106,7 +116,11 @@ export class ProductFormComponent implements OnInit {
   }
 
   onReset() {
-    this.productForm.reset();
+    if (this.isEditMode) {
+      this.router.navigate(['/']);
+    } else {
+      this.productForm.reset();
+    }
   }
 
   minTodayValidator(control: AbstractControl) {
@@ -143,7 +157,7 @@ export class ProductFormComponent implements OnInit {
 
   uniqueIdValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
-      if (!control.value || this.isEditMode) return of(null); // skip async validation in edit mode
+      if (!control.value || this.isEditMode) return of(null);
       return of(control.value).pipe(
         debounceTime(300),
         switchMap((id: string) =>
@@ -155,4 +169,11 @@ export class ProductFormComponent implements OnInit {
       );
     };
   }
+
+  private formatDateToInput(date: string | Date): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0]; // yyyy-MM-dd
+  }
+
+
 }
