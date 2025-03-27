@@ -44,11 +44,12 @@
 
 
 
-  <button type="submit" [disabled]="productForm.invalid">
-  {{ isEditMode ? 'Guardar' : 'Agregar' }}
+  <button type="submit" [disabled]="productForm.invalid" class="full-width">
+    {{ isEditMode ? 'Guardar' : 'Agregar' }}
   </button>
 
-  <button type="button" (click)="onReset()">
+  <button type="button" (click)="onReset()" class="full-width">
     {{ isEditMode ? 'Cancelar' : 'Reiniciar' }}
   </button>
+
 </form>
