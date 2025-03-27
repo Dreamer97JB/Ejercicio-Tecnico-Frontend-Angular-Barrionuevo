@@ -18,11 +18,11 @@ export class ProductListComponent implements OnInit {
   loading = true;
 
   //búsqueda de producto
-  filterTerm: string = '';
+  filterTerm = '';
 
   //paginación
-  pageSize: number = 5;
-  currentPage: number = 1;
+  pageSize = 5;
+  currentPage = 1;
 
   constructor(private productService: ProductService) { }
 
