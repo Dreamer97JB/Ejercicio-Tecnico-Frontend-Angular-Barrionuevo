@@ -18,6 +18,19 @@ export class ProductService {
     );
   }
 
+  getProductById(id: string): Observable<FinancialProduct> {
+    return this.http.get<{ data: FinancialProduct }>(`${this.baseUrl}/${id}`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  updateProduct(product: FinancialProduct): Observable<{ message: string; data: FinancialProduct }> {
+    return this.http.put<{ message: string; data: FinancialProduct }>(
+      `${this.baseUrl}/${product.id}`,
+      product
+    );
+  }
+
   createProduct(product: FinancialProduct): Observable<{ message: string; data: FinancialProduct }> {
     return this.http.post<{ message: string; data: FinancialProduct }>(this.baseUrl, product);
   }

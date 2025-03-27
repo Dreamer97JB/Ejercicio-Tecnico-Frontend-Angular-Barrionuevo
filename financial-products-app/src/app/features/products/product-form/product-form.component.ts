@@ -1,9 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormGroup, AsyncValidatorFn, AbstractControl } from '@angular/forms';
-import { Router } from '@angular/router';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+  FormGroup,
+  AsyncValidatorFn,
+  AbstractControl
+} from '@angular/forms';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { ApiError } from '../../../core/models/api-error.model';
+import { FinancialProduct } from '../../../core/models/financial-product.model';
 import { catchError, debounceTime, map, of, switchMap } from 'rxjs';
 
 @Component({
@@ -13,12 +21,15 @@ import { catchError, debounceTime, map, of, switchMap } from 'rxjs';
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss']
 })
-export class ProductFormComponent {
+export class ProductFormComponent implements OnInit {
   productForm: FormGroup;
+  isEditMode = false;
+  productId: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private route: ActivatedRoute,
     private productService: ProductService
   ) {
     this.productForm = this.fb.group({
@@ -37,7 +48,7 @@ export class ProductFormComponent {
       date_revision: [
         { value: '', disabled: true },
         [Validators.required, this.matchOneYearAfterRelease()]
-      ],
+      ]
     });
 
     this.productForm.get('date_release')?.valueChanges.subscribe((releaseDate: string) => {
@@ -51,9 +62,51 @@ export class ProductFormComponent {
       const revisionStr = revisionDate.toISOString().split('T')[0];
 
       this.productForm.get('date_revision')?.setValue(revisionStr);
-      this.productForm.get('date_revision')?.markAsTouched(); // Optional
+      this.productForm.get('date_revision')?.markAsTouched();
     });
+  }
 
+  ngOnInit(): void {
+    this.productId = this.route.snapshot.paramMap.get('id');
+
+    if (this.productId) {
+      this.isEditMode = true;
+
+      this.productService.getProductById(this.productId).subscribe({
+        next: (product) => {
+          this.productForm.patchValue(product);
+          this.productForm.get('id')?.disable(); 
+        },
+        error: (err) => {
+          alert('No se pudo cargar el producto para edición: ' + err.message);
+          this.router.navigate(['/']);
+        }
+      });
+    }
+  }
+
+  onSubmit() {
+    if (this.productForm.invalid) {
+      this.productForm.markAllAsTouched();
+      return;
+    }
+
+    const product: FinancialProduct = this.isEditMode
+      ? { ...this.productForm.getRawValue(), id: this.productId! }
+      : this.productForm.getRawValue();
+
+    const request$ = this.isEditMode
+      ? this.productService.updateProduct(product)
+      : this.productService.createProduct(product);
+
+    request$.subscribe({
+      next: () => this.router.navigate(['/']),
+      error: (err: ApiError) => alert('Error al guardar producto: ' + err.message)
+    });
+  }
+
+  onReset() {
+    this.productForm.reset();
   }
 
   minTodayValidator(control: AbstractControl) {
@@ -61,14 +114,11 @@ export class ProductFormComponent {
 
     const [year, month, day] = control.value.split('-').map(Number);
     const inputYMD = new Date(year, month - 1, day);
-
     const today = new Date();
     const todayYMD = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
-
     return inputYMD >= todayYMD ? null : { minDate: true };
   }
-
 
   matchOneYearAfterRelease() {
     return (control: AbstractControl) => {
@@ -93,7 +143,7 @@ export class ProductFormComponent {
 
   uniqueIdValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
-      if (!control.value) return of(null);
+      if (!control.value || this.isEditMode) return of(null); // skip async validation in edit mode
       return of(control.value).pipe(
         debounceTime(300),
         switchMap((id: string) =>
@@ -104,23 +154,5 @@ export class ProductFormComponent {
         )
       );
     };
-  }
-
-  onSubmit() {
-    if (this.productForm.invalid) {
-      this.productForm.markAllAsTouched();
-      return;
-    }
-
-    const product = this.productForm.getRawValue();
-    // console.log(this.productForm.getRawValue())
-    this.productService.createProduct(product).subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (err: ApiError) => alert('Error al agregar producto: ' + err.message)
-    });
-  }
-
-  onReset() {
-    this.productForm.reset();
   }
 }
