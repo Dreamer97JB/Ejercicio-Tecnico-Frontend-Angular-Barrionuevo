@@ -1,0 +1,62 @@
+<h2>Listado de Productos Financieros</h2>
+
+<button routerLink="/add" class="add-button">➕ Agregar Producto</button>
+
+<div class="search-wrapper">
+  <input
+    type="text"
+    [(ngModel)]="filterTerm"
+    (input)="onSearchChange()"
+    placeholder="Buscar producto financiero por nombre..."
+  />
+</div>
+
+<div *ngIf="loading">
+  <p>Cargando productos...</p> <!-- Replace later with skeleton -->
+</div>
+
+<div class="pagination-header">
+  <p>Mostrando {{ paginatedProducts.length }} de {{ totalResults }} resultados</p>
+
+  <label for="pageSize">Registros por página:</label>
+  <select id="pageSize" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+    <option [value]="5">5</option>
+    <option [value]="10">10</option>
+    <option [value]="20">20</option>
+  </select>
+</div>
+
+<table *ngIf="!loading && filteredProducts.length > 0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Logo</th>
+      <th>Fecha de Liberación</th>
+      <th>Fecha de Revisión</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let product of paginatedProducts">
+      <td>{{ product.id }}</td>
+      <td>{{ product.name }}</td>
+      <td>{{ product.description }}</td>
+      <td>
+        <img [src]="product.logo" alt="Logo" width="100" />
+      </td>
+      <td>{{ product.date_release }}</td>
+      <td>{{ product.date_revision }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="totalResults > pageSize" class="pagination-controls">
+  <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
+  <span>Página {{ currentPage }}</span>
+  <button (click)="currentPage = currentPage + 1" [disabled]="(currentPage * pageSize) >= totalResults">Siguiente</button>
+</div>
+
+<div *ngIf="!loading && filteredProducts.length === 0">
+  <p>No hay productos disponibles.</p>
+</div>
