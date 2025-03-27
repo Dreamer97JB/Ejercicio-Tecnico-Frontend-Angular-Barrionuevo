@@ -81,7 +81,24 @@ export class ProductListComponent implements OnInit {
   }
 
   onDelete(id: string): void {
-    console.warn(`Simulación: producto con ID '${id}' eliminado`);
+    const confirmed = confirm(`¿Estás seguro de eliminar el producto con ID "${id}"?`);
+    if (!confirmed) return;
+
+    this.productService.deleteProduct(id).subscribe({
+      next: (res) => {
+        console.log('Producto eliminado:', res.message);
+
+        // Remove from both arrays
+        this.allProducts = this.allProducts.filter(p => p.id !== id);
+        this.filteredProducts = this.filteredProducts.filter(p => p.id !== id);
+
+        // Close menu
+        this.menuOpenId = null;
+      },
+      error: (err) => {
+        alert('Error al eliminar producto: ' + err.message);
+      }
+    });
   }
 
   onSearchChange(): void {

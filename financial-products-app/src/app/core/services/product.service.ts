@@ -35,6 +35,10 @@ export class ProductService {
     return this.http.post<{ message: string; data: FinancialProduct }>(this.baseUrl, product);
   }
 
+  deleteProduct(id: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`);
+  }
+
   verifyId(id: string): Observable<boolean> {
     return this.http.get<boolean>(`${this.baseUrl}/verification/${id}`);
   }
