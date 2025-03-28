@@ -1,4 +1,3 @@
-// shared/validators/safe-character.validator.ts
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 export function safeCharacterValidator(allowUrl = false) {
