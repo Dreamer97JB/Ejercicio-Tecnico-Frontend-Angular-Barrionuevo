@@ -26,7 +26,6 @@ describe('ProductFormComponent', () => {
           name: 'Producto existente',
           description: 'Descripción editada',
           logo: 'http://img.png',
-          // Usar fechas FUTURAS para no fallar con el minTodayValidator
           date_release: new Date('2030-01-01'),
           date_revision: new Date('2031-01-01'),
         })
@@ -119,7 +118,7 @@ describe('ProductFormComponent', () => {
 
     const validator = component.matchOneYearAfterRelease();
     const result = validator(formGroup.get('date_revision')!);
-    expect(result).toBeNull(); // válido
+    expect(result).toBeNull();
   });
 
   it('should call createProduct and navigate on valid form submission', async () => {
@@ -198,7 +197,6 @@ describe('ProductFormComponent', () => {
     component.isEditMode = false;
     component.productForm.patchValue({ name: 'Test' });
     component.onReset();
-    // En modo creación, resetea el form
     expect(component.productForm.value.name).toBeFalsy();
   });
 
@@ -222,7 +220,6 @@ describe('ProductFormComponent', () => {
     expect(preventDefault).not.toHaveBeenCalled();
   });
 
-  // --- Tests adicionales para mayor coverage ---
 
   it('should handle error in getProductById for edit mode', () => {
     const id = 'prod-err';
@@ -246,7 +243,6 @@ describe('ProductFormComponent', () => {
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
   });
 
-  // ATENCIÓN: agregamos fakeAsync + tick(300) para que el asyncValidator (con debounce) se dispare
   it('should mark ID as taken if verifyId returns true (uniqueIdValidator) - using blur event', fakeAsync(() => {
     productServiceMock.verifyId.mockReturnValueOnce(of(true));
     component.isEditMode = false;
@@ -254,12 +250,13 @@ describe('ProductFormComponent', () => {
     const idControl = component.productForm.get('id');
     idControl?.setValue('existing-id');
 
-    // Simular el blur en el input del control
-    const idInput = fixture.debugElement.query(By.css('input[formControlName="id"]'));
-    expect(idInput).toBeTruthy(); // Asegurarse de que el input exista
-    idInput.triggerEventHandler('blur', {});
+    fixture.detectChanges();
 
-    tick(300); // Espera el debounceTime
+    const idInput = fixture.debugElement.query(By.css('input[formControlName="id"]'));
+    expect(idInput).toBeTruthy();
+
+    idInput.triggerEventHandler('blur', {});
+    tick(300);
     fixture.detectChanges();
 
     expect(idControl?.errors?.['idTaken']).toBeTruthy();
@@ -272,7 +269,6 @@ describe('ProductFormComponent', () => {
     releaseControl?.setValue('2030-05-10');
     expect(revisionControl?.value).toBe('2031-05-10');
 
-    // Si vaciamos date_release, la revisión también se vacía
     releaseControl?.setValue('');
     expect(revisionControl?.value).toBe('');
   });
