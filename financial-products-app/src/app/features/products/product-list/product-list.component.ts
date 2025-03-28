@@ -13,6 +13,7 @@ import { AbstractControl, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ConfirmDeleteModalComponent } from "../../../shared/components/confirm-delete-modal/confirm-delete-modal.component";
 import { safeCharacterValidator } from '../../../shared/validators/safe-character.validator';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 
 @Component({
   standalone: true,
@@ -44,7 +45,8 @@ export class ProductListComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private snackbar: SnackbarService
   ) { }
 
   ngOnInit(): void {
@@ -97,18 +99,22 @@ export class ProductListComponent implements OnInit {
 
   confirmDelete(): void {
     if (!this.selectedProductId) return;
+
     this.productService.deleteProduct(this.selectedProductId).subscribe({
       next: () => {
         this.filteredProducts = this.filteredProducts.filter(p => p.id !== this.selectedProductId);
         this.allProducts = this.allProducts.filter(p => p.id !== this.selectedProductId);
         this.showDeleteModal = false;
         this.menuOpenId = null;
+
+        this.snackbar.show('Producto eliminado correctamente', 'success');
       },
       error: (err) => {
-        alert('Error eliminando producto: ' + err.message);
+        this.snackbar.show('Error al eliminar producto: ' + err.message, 'error');
       }
     });
   }
+
 
 
   cancelDelete(): void {
