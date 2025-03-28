@@ -27,7 +27,11 @@ const config: Config = {
     'jest-preset-angular/build/serializers/no-ng-attributes',
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment'
-  ]
+  ],
+  
+  collectCoverage: true,
+  coverageDirectory: 'coverage/jest',
+  coverageReporters: ['html', 'text-summary']
 };
 
 export default config;
