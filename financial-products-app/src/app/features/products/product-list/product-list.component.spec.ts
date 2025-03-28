@@ -48,9 +48,9 @@ describe('ProductListComponent', () => {
         {
           provide: ActivatedRoute,
           useValue: {
-            queryParams: of({}), // si tu componente usa queryParams como observable
+            queryParams: of({}),
             snapshot: {
-              queryParams: {}, // si accede con this.route.snapshot.queryParams
+              queryParams: {},
             },
           },
         },

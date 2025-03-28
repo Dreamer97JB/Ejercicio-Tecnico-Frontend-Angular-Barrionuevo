@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ProductFormComponent } from './product-form.component';
 import { ProductService } from '../../../core/services/product.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 
 
 function createControlMock(value: string): AbstractControl {
@@ -17,8 +18,26 @@ describe('ProductFormComponent', () => {
   let fixture: ComponentFixture<ProductFormComponent>;
   let productServiceMock: jest.Mocked<ProductService>;
   let routerMock: jest.Mocked<Router>;
+  let activatedRouteMock: Partial<ActivatedRoute>;
+  let snackbarServiceMock: Partial<SnackbarService>;
 
   beforeEach(async () => {
+
+    activatedRouteMock = {
+      snapshot: {
+        paramMap: {
+          get: () => null,
+          has: () => false,
+          getAll: () => [],
+          keys: [],
+        }
+      }
+    } as unknown as ActivatedRoute;
+
+    snackbarServiceMock = {
+      show: jest.fn(),
+    };
+
     productServiceMock = {
       verifyId: jest.fn().mockReturnValue(of(false)),
       createProduct: jest.fn().mockReturnValue(of({})),
@@ -33,6 +52,8 @@ describe('ProductFormComponent', () => {
       providers: [
         { provide: ProductService, useValue: productServiceMock },
         { provide: Router, useValue: routerMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: SnackbarService, useValue: snackbarServiceMock }
       ],
     }).compileComponents();
 
