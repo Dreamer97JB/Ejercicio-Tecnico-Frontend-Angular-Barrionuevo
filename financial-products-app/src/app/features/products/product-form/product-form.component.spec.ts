@@ -3,7 +3,7 @@ import { ProductFormComponent } from './product-form.component';
 import { ProductService } from '../../../core/services/product.service';
 import { ActivatedRoute, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 
 describe('ProductFormComponent', () => {
@@ -54,7 +54,7 @@ describe('ProductFormComponent', () => {
         component: null,
         routeConfig: null,
         title: undefined,
-        root: new ActivatedRouteSnapshot,
+        root: new ActivatedRouteSnapshot(),
         parent: null,
         firstChild: null,
         children: [],
@@ -101,13 +101,23 @@ describe('ProductFormComponent', () => {
 
   it('should validate minTodayValidator correctly', () => {
     const validator = component.minTodayValidator;
-
     const pastDate = new FormControl('2000-01-01');
     const futureDate = new FormControl('2999-12-31');
-
     expect(validator(pastDate)).toEqual({ minDate: true });
     expect(validator(futureDate)).toBeNull();
   });
+
+  it('should validate matchOneYearAfterRelease correctly', () => {
+    const formGroup = new FormGroup({
+      date_release: new FormControl('2024-03-25'),
+      date_revision: new FormControl('2025-03-25')
+    });
+
+    const validator = component.matchOneYearAfterRelease();
+    const result = validator(formGroup.get('date_revision')!);
+    expect(result).toBeNull(); // válido
+  });
+
 
   it('should call createProduct and navigate on valid form submission', async () => {
     component.productForm.setValue({
@@ -118,28 +128,16 @@ describe('ProductFormComponent', () => {
       date_release: '2024-03-25',
       date_revision: '2025-03-25',
     });
-
-    component.productForm.get('id')?.markAsTouched();
-    component.productForm.get('id')?.updateValueAndValidity();
     await fixture.whenStable();
-
     expect(component.productForm.valid).toBe(true);
-
     component.onSubmit();
-
     expect(productServiceMock.createProduct).toHaveBeenCalled();
-    expect(snackbarServiceMock.show).toHaveBeenCalledWith(
-      'Producto creado correctamente',
-      'success'
-    );
+    expect(snackbarServiceMock.show).toHaveBeenCalledWith('Producto creado correctamente', 'success');
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
   });
 
   it('should show snackbar on submission error (create)', () => {
-    productServiceMock.createProduct.mockReturnValueOnce(
-      throwError(() => ({ message: 'Falló' }))
-    );
-
+    productServiceMock.createProduct.mockReturnValueOnce(throwError(() => ({ message: 'Falló' })));
     component.productForm.setValue({
       id: 'valid-id',
       name: 'Valid Name',
@@ -148,13 +146,8 @@ describe('ProductFormComponent', () => {
       date_release: '2024-03-25',
       date_revision: '2025-03-25',
     });
-
     component.onSubmit();
-
-    expect(snackbarServiceMock.show).toHaveBeenCalledWith(
-      'Error al guardar producto: Falló',
-      'error'
-    );
+    expect(snackbarServiceMock.show).toHaveBeenCalledWith('Error al guardar producto: Falló', 'error');
   });
 
   it('should not submit when form is invalid', () => {
@@ -165,30 +158,47 @@ describe('ProductFormComponent', () => {
   });
 
   it('should load product and call updateProduct in edit mode', () => {
-    // Simular que hay un ID en la ruta
     const id = 'prod-01';
     (activatedRouteMock.snapshot!.paramMap.get as jest.Mock).mockReturnValue(id);
-
-    // Volver a crear el componente con ese ID
     fixture = TestBed.createComponent(ProductFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 
     expect(component.isEditMode).toBe(true);
-
-    // Confirmar que cargó el producto
     expect(productServiceMock.getProductById).toHaveBeenCalledWith('prod-01');
 
-    component.productForm.enable(); // para simular edición
+    component.productForm.enable();
     component.onSubmit();
 
-    expect(productServiceMock.updateProduct).toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'prod-01' })
-    );
-    expect(snackbarServiceMock.show).toHaveBeenCalledWith(
-      'Producto editado correctamente',
-      'success'
-    );
+    expect(productServiceMock.updateProduct).toHaveBeenCalledWith(expect.objectContaining({ id: 'prod-01' }));
+    expect(snackbarServiceMock.show).toHaveBeenCalledWith('Producto editado correctamente', 'success');
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should reset the form in creation mode', () => {
+    component.isEditMode = false;
+    component.productForm.patchValue({ name: 'Test' });
+    component.onReset();
+    expect(component.productForm.value.name).toBeFalsy();
+  });
+
+  it('should navigate back in edit mode when reset is clicked', () => {
+    component.isEditMode = true;
+    component.onReset();
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  it('should prevent unsafe characters in logo field', () => {
+    const event = new KeyboardEvent('keydown', { key: '@' });
+    const preventDefault = jest.spyOn(event, 'preventDefault');
+    component.preventUnsafeChars(event, 'logo');
+    expect(preventDefault).toHaveBeenCalled();
+  });
+
+  it('should allow safe characters in name field', () => {
+    const event = new KeyboardEvent('keydown', { key: 'a' });
+    const preventDefault = jest.spyOn(event, 'preventDefault');
+    component.preventUnsafeChars(event, 'name');
+    expect(preventDefault).not.toHaveBeenCalled();
   });
 });
