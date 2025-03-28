@@ -41,14 +41,12 @@ describe('ProductListComponent', () => {
       updateProduct: jest.fn(),
       createProduct: jest.fn(),
       verifyId: jest.fn(),
-      // deleteProduct debe retornar un Observable con al menos la propiedad "message"
       deleteProduct: jest.fn((): Observable<{ message: string }> => of({ message: 'Deleted' })),
       baseUrl: '',
       http: {},
     } as unknown as jest.Mocked<ProductService>;
 
     routerMock = {
-      // Renombramos commands a _commands para evitar la advertencia de "unused variable"
       navigate: jest.fn((_commands: string[]): Promise<boolean> => Promise.resolve(true)),
       events: of(new Event('')),
       routerState: {},
@@ -117,9 +115,7 @@ describe('ProductListComponent', () => {
   });
 
   it('should handle service error gracefully', () => {
-    // Renombramos args a _args para evitar advertencia de "unused variable"
     const consoleSpy = jest.spyOn(console, 'error').mockImplementation((..._args: unknown[]): void => {
-      // sin lógica
     });
     productServiceMock.getProducts.mockReturnValueOnce(throwError(() => new Error('error')));
     component.ngOnInit();
@@ -150,7 +146,6 @@ describe('ProductListComponent', () => {
   });
 
   it('should close menu on document click if click is outside menus and not on a button', () => {
-    // Renombramos fn a _fn para evitar advertencia
     component.menus = {
       some: (_fn: (menu: ElementRef) => boolean): boolean => false,
     } as QueryList<ElementRef>;
@@ -168,7 +163,6 @@ describe('ProductListComponent', () => {
     const insideElement: HTMLElement = document.createElement('span');
     menuElement.appendChild(insideElement);
     const fakeMenu: ElementRef = { nativeElement: menuElement };
-    // Renombramos fn a _fn
     component.menus = {
       some: (_fn: (menu: ElementRef) => boolean): boolean => _fn(fakeMenu),
     } as QueryList<ElementRef>;
@@ -224,7 +218,6 @@ describe('ProductListComponent', () => {
     component.showDeleteModal = true;
     component.menuOpenId = 'inv-fondo7';
 
-    // Renombramos msg, type a _msg, _type para evitar advertencia
     const snackbarSpy = jest
       .spyOn(component['snackbar'], 'show')
       .mockImplementation((_msg: string, _type: string): void => { });
@@ -247,7 +240,6 @@ describe('ProductListComponent', () => {
   it('should handle confirmDelete error', () => {
     component.selectedProductId = 'inv-fondo7';
     const error: Error = new Error('Delete failed');
-    // Renombramos msg, type a _msg, _type
     const snackbarSpy = jest
       .spyOn(component['snackbar'], 'show')
       .mockImplementation((_msg: string, _type: string): void => { });
