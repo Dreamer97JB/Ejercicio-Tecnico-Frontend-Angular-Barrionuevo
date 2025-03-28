@@ -4,6 +4,7 @@
       type="text"
       [(ngModel)]="filterTerm"
       (input)="onSearchChange()"
+      (keydown)="preventUnsafeChars($event)"
       placeholder="Buscar Productos Financieros..."
       class="search-input"
     />

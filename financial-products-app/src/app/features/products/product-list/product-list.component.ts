@@ -9,9 +9,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../../core/services/product.service';
 import { FinancialProduct } from '../../../core/models/financial-product.model';
-import { FormsModule } from '@angular/forms';
+import { AbstractControl, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ConfirmDeleteModalComponent } from "../../../shared/components/confirm-delete-modal.component";
+import { safeCharacterValidator } from '../../../shared/validators/safe-character.validator';
 
 @Component({
   standalone: true,
@@ -117,6 +118,14 @@ export class ProductListComponent implements OnInit {
   }
 
   onSearchChange(): void {
+    const mockControl: Pick<AbstractControl, 'value'> = { value: this.filterTerm };
+    const unsafeCheck = safeCharacterValidator()(mockControl as AbstractControl);
+
+    if (unsafeCheck) {
+      this.filteredProducts = [];
+      return;
+    }
+
     const term = this.filterTerm.toLowerCase();
     this.filteredProducts = this.allProducts.filter((product) =>
       product.name.toLowerCase().includes(term)
@@ -128,6 +137,13 @@ export class ProductListComponent implements OnInit {
     this.currentPage = 1;
   }
 
+  preventUnsafeChars(event: KeyboardEvent): void {
+    const allowed = /[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ\-()]/;
+    if (!allowed.test(event.key) && event.key.length === 1) {
+      event.preventDefault();
+    }
+  }
+  
   get paginatedProducts(): FinancialProduct[] {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
