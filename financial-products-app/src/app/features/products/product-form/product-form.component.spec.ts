@@ -1,10 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ProductFormComponent } from './product-form.component';
 import { ProductService } from '../../../core/services/product.service';
 import { ActivatedRoute, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 import { SnackbarService } from '../../../core/services/snackbar.service';
+import { By } from '@angular/platform-browser';
 
 describe('ProductFormComponent', () => {
   let component: ProductFormComponent;
@@ -19,14 +20,17 @@ describe('ProductFormComponent', () => {
       verifyId: jest.fn().mockReturnValue(of(false)),
       createProduct: jest.fn().mockReturnValue(of({})),
       updateProduct: jest.fn().mockReturnValue(of({})),
-      getProductById: jest.fn().mockReturnValue(of({
-        id: 'prod-01',
-        name: 'Producto existente',
-        description: 'Descripción editada',
-        logo: 'http://img.png',
-        date_release: new Date('2024-01-01'),
-        date_revision: new Date('2025-01-01'),
-      })),
+      getProductById: jest.fn().mockReturnValue(
+        of({
+          id: 'prod-01',
+          name: 'Producto existente',
+          description: 'Descripción editada',
+          logo: 'http://img.png',
+          // Usar fechas FUTURAS para no fallar con el minTodayValidator
+          date_release: new Date('2030-01-01'),
+          date_revision: new Date('2031-01-01'),
+        })
+      ),
     } as unknown as jest.Mocked<ProductService>;
 
     routerMock = {
@@ -94,9 +98,9 @@ describe('ProductFormComponent', () => {
 
   it('should compute revision date when release date changes', () => {
     const releaseControl = component.productForm.get('date_release');
-    releaseControl?.setValue('2024-03-25');
+    releaseControl?.setValue('2030-03-25');
     const revisionValue = component.productForm.get('date_revision')?.value;
-    expect(revisionValue).toBe('2025-03-25');
+    expect(revisionValue).toBe('2031-03-25');
   });
 
   it('should validate minTodayValidator correctly', () => {
@@ -109,8 +113,8 @@ describe('ProductFormComponent', () => {
 
   it('should validate matchOneYearAfterRelease correctly', () => {
     const formGroup = new FormGroup({
-      date_release: new FormControl('2024-03-25'),
-      date_revision: new FormControl('2025-03-25')
+      date_release: new FormControl('2030-03-25'),
+      date_revision: new FormControl('2031-03-25'),
     });
 
     const validator = component.matchOneYearAfterRelease();
@@ -118,36 +122,46 @@ describe('ProductFormComponent', () => {
     expect(result).toBeNull(); // válido
   });
 
-
   it('should call createProduct and navigate on valid form submission', async () => {
     component.productForm.setValue({
       id: 'valid-id',
       name: 'Valid Name',
       description: 'Valid product description',
       logo: 'http://logo.png',
-      date_release: '2024-03-25',
-      date_revision: '2025-03-25',
+      date_release: '2030-03-25',
+      date_revision: '2031-03-25',
     });
     await fixture.whenStable();
     expect(component.productForm.valid).toBe(true);
+
     component.onSubmit();
     expect(productServiceMock.createProduct).toHaveBeenCalled();
-    expect(snackbarServiceMock.show).toHaveBeenCalledWith('Producto creado correctamente', 'success');
+    expect(snackbarServiceMock.show).toHaveBeenCalledWith(
+      'Producto creado correctamente',
+      'success'
+    );
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
   });
 
   it('should show snackbar on submission error (create)', () => {
-    productServiceMock.createProduct.mockReturnValueOnce(throwError(() => ({ message: 'Falló' })));
+    productServiceMock.createProduct.mockReturnValueOnce(
+      throwError(() => ({ message: 'Falló' }))
+    );
+
     component.productForm.setValue({
       id: 'valid-id',
       name: 'Valid Name',
       description: 'Valid product description',
       logo: 'http://logo.png',
-      date_release: '2024-03-25',
-      date_revision: '2025-03-25',
+      date_release: '2030-03-25',
+      date_revision: '2031-03-25',
     });
     component.onSubmit();
-    expect(snackbarServiceMock.show).toHaveBeenCalledWith('Error al guardar producto: Falló', 'error');
+
+    expect(snackbarServiceMock.show).toHaveBeenCalledWith(
+      'Error al guardar producto: Falló',
+      'error'
+    );
   });
 
   it('should not submit when form is invalid', () => {
@@ -160,6 +174,7 @@ describe('ProductFormComponent', () => {
   it('should load product and call updateProduct in edit mode', () => {
     const id = 'prod-01';
     (activatedRouteMock.snapshot!.paramMap.get as jest.Mock).mockReturnValue(id);
+
     fixture = TestBed.createComponent(ProductFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -169,9 +184,13 @@ describe('ProductFormComponent', () => {
 
     component.productForm.enable();
     component.onSubmit();
-
-    expect(productServiceMock.updateProduct).toHaveBeenCalledWith(expect.objectContaining({ id: 'prod-01' }));
-    expect(snackbarServiceMock.show).toHaveBeenCalledWith('Producto editado correctamente', 'success');
+    expect(productServiceMock.updateProduct).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'prod-01' })
+    );
+    expect(snackbarServiceMock.show).toHaveBeenCalledWith(
+      'Producto editado correctamente',
+      'success'
+    );
     expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
   });
 
@@ -179,6 +198,7 @@ describe('ProductFormComponent', () => {
     component.isEditMode = false;
     component.productForm.patchValue({ name: 'Test' });
     component.onReset();
+    // En modo creación, resetea el form
     expect(component.productForm.value.name).toBeFalsy();
   });
 
@@ -200,5 +220,66 @@ describe('ProductFormComponent', () => {
     const preventDefault = jest.spyOn(event, 'preventDefault');
     component.preventUnsafeChars(event, 'name');
     expect(preventDefault).not.toHaveBeenCalled();
+  });
+
+  // --- Tests adicionales para mayor coverage ---
+
+  it('should handle error in getProductById for edit mode', () => {
+    const id = 'prod-err';
+    (activatedRouteMock.snapshot!.paramMap.get as jest.Mock).mockReturnValue(id);
+
+    productServiceMock.getProductById.mockReturnValueOnce(
+      throwError(() => ({ message: 'Not found!' }))
+    );
+
+    fixture = TestBed.createComponent(ProductFormComponent);
+    component = fixture.componentInstance;
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => { });
+    fixture.detectChanges();
+
+    expect(productServiceMock.getProductById).toHaveBeenCalledWith('prod-err');
+    expect(alertSpy).toHaveBeenCalledWith(
+      'No se pudo cargar el producto: Not found!'
+    );
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/']);
+  });
+
+  // ATENCIÓN: agregamos fakeAsync + tick(300) para que el asyncValidator (con debounce) se dispare
+  it('should mark ID as taken if verifyId returns true (uniqueIdValidator) - using blur event', fakeAsync(() => {
+    productServiceMock.verifyId.mockReturnValueOnce(of(true));
+    component.isEditMode = false;
+
+    const idControl = component.productForm.get('id');
+    idControl?.setValue('existing-id');
+
+    // Simular el blur en el input del control
+    const idInput = fixture.debugElement.query(By.css('input[formControlName="id"]'));
+    expect(idInput).toBeTruthy(); // Asegurarse de que el input exista
+    idInput.triggerEventHandler('blur', {});
+
+    tick(300); // Espera el debounceTime
+    fixture.detectChanges();
+
+    expect(idControl?.errors?.['idTaken']).toBeTruthy();
+  }));
+
+  it('should clear date_revision if date_release is emptied', () => {
+    const releaseControl = component.productForm.get('date_release');
+    const revisionControl = component.productForm.get('date_revision');
+
+    releaseControl?.setValue('2030-05-10');
+    expect(revisionControl?.value).toBe('2031-05-10');
+
+    // Si vaciamos date_release, la revisión también se vacía
+    releaseControl?.setValue('');
+    expect(revisionControl?.value).toBe('');
+  });
+
+  it('should invalidate date_release if it is in the past', () => {
+    const releaseControl = component.productForm.get('date_release');
+    releaseControl?.setValue('2000-01-01');
+    expect(releaseControl?.errors?.['minDate']).toBeTruthy();
   });
 });
