@@ -11,7 +11,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { FinancialProduct } from '../../../core/models/financial-product.model';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ConfirmDeleteModalComponent } from "../../../shared/components/confirm-delete-modal.component";
+import { ConfirmDeleteModalComponent } from "../../../shared/components/confirm-delete-modal/confirm-delete-modal.component";
 import { safeCharacterValidator } from '../../../shared/validators/safe-character.validator';
 
 @Component({
@@ -143,7 +143,7 @@ export class ProductListComponent implements OnInit {
       event.preventDefault();
     }
   }
-  
+
   get paginatedProducts(): FinancialProduct[] {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;

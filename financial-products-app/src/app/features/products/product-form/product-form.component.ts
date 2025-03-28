@@ -14,6 +14,7 @@ import { ApiError } from '../../../core/models/api-error.model';
 import { FinancialProduct } from '../../../core/models/financial-product.model';
 import { catchError, debounceTime, map, of, switchMap } from 'rxjs';
 import { safeCharacterValidator } from '../../../shared/validators/safe-character.validator';
+import { SnackbarService } from '../../../core/services/snackbar.service';
 
 @Component({
   standalone: true,
@@ -56,7 +57,8 @@ export class ProductFormComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private productService: ProductService
+    private productService: ProductService,
+    private snackbar: SnackbarService
   ) {
     this.productForm = this.fb.group({
       id: [
@@ -161,8 +163,18 @@ export class ProductFormComponent implements OnInit {
       : this.productService.createProduct(product);
 
     request$.subscribe({
-      next: () => this.router.navigate(['/']),
-      error: (err: ApiError) => alert('Error al guardar producto: ' + err.message)
+      next: () => {
+        this.snackbar.show(
+          this.isEditMode
+            ? 'Producto editado correctamente'
+            : 'Producto creado correctamente',
+          'success'
+        );
+        this.router.navigate(['/']);
+      },
+      error: (err: ApiError) => {
+        this.snackbar.show('Error al guardar producto: ' + err.message, 'error');
+      }
     });
   }
 
