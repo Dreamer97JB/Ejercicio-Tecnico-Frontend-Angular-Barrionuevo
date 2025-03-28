@@ -13,6 +13,7 @@ import { ProductService } from '../../../core/services/product.service';
 import { ApiError } from '../../../core/models/api-error.model';
 import { FinancialProduct } from '../../../core/models/financial-product.model';
 import { catchError, debounceTime, map, of, switchMap } from 'rxjs';
+import { safeCharacterValidator } from '../../../shared/validators/safe-character.validator';
 
 @Component({
   standalone: true,
@@ -27,7 +28,7 @@ export class ProductFormComponent implements OnInit {
   productId: string | null = null;
 
   fieldLabels: Record<string, string> = {
-    id: 'Identificador',
+    id: 'ID',
     name: 'Nombre del Producto',
     description: 'Descripción',
     logo: 'Logo (URL)',
@@ -36,7 +37,7 @@ export class ProductFormComponent implements OnInit {
   };
 
   fieldplaceholderLabels: Record<string, string> = {
-    id: 'Identificador',
+    id: 'ID',
     name: 'Nombre del Producto',
     description: 'Descripción',
     logo: 'Logo (URL)',
@@ -44,6 +45,12 @@ export class ProductFormComponent implements OnInit {
     date_revision: 'Fecha de Revisión'
   };
 
+  fieldMaxLengths: Record<string, number> = {
+    id: 10,
+    name: 100,
+    description: 200,
+    logo: 600
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -55,14 +62,39 @@ export class ProductFormComponent implements OnInit {
       id: [
         '',
         {
-          validators: [Validators.required, Validators.minLength(3), Validators.maxLength(10)],
+          validators: [
+            Validators.required,
+            Validators.minLength(3),
+            Validators.maxLength(10),
+            safeCharacterValidator()
+          ],
           asyncValidators: [this.uniqueIdValidator()],
           updateOn: 'blur'
         }
       ],
-      name: ['', [Validators.required, Validators.minLength(5), Validators.maxLength(100)]],
-      description: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(200)]],
-      logo: ['', Validators.required],
+      name: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(100),
+          safeCharacterValidator()
+        ]],
+      description: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(10),
+          Validators.maxLength(200),
+          safeCharacterValidator()
+        ]
+      ],
+      logo: [
+        '',
+        [Validators.required,
+          safeCharacterValidator(true)
+        ]
+      ],
       date_release: ['', [Validators.required, this.minTodayValidator]],
       date_revision: [
         { value: '', disabled: true },
@@ -194,5 +226,13 @@ export class ProductFormComponent implements OnInit {
     return d.toISOString().split('T')[0]; // yyyy-MM-dd
   }
 
+  preventUnsafeChars(event: KeyboardEvent, field: string) {
+    const allowed = field === 'logo'
+      ? /[a-zA-Z0-9:/._-]/
+      : /[a-zA-Z0-9\s.,áéíóúÁÉÍÓÚñÑ\-()]/;
 
+    if (!allowed.test(event.key) && event.key.length === 1) {
+      event.preventDefault();
+    }
+  }
 }

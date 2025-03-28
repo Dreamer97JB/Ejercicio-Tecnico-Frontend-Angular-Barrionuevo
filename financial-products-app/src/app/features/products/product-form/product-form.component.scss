@@ -9,6 +9,25 @@ form {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
 
+  .form-title-bar {
+    grid-column: span 2;
+    border-bottom: 1px solid #000;
+    margin-bottom: 0.5rem;
+    margin-left: -2rem;
+    margin-right: -2rem;
+    padding-bottom: 2rem;
+
+    text-align: center;
+
+    h2 {
+      font-family: 'Roboto Slab', serif;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 0;
+      color: #000000;
+    }
+  }
+
   h2 {
     grid-column: span 2;
     text-align: center;
@@ -23,6 +42,13 @@ form {
     font-weight: bold;
     font-size: 14px;
     color: #333;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    margin-right: 2rem;
   }
 
   input {
@@ -82,50 +108,50 @@ form {
     cursor: not-allowed;
   }
 
-        .button-row {
-          grid-column: span 2;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 1rem;
+  .button-row {
+    grid-column: span 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
 
-          button {
-            width: 140px;
-            padding: 10px 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Montserrat', sans-serif;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-          }
+    button {
+      width: 140px;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Montserrat', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
 
-          button[type='submit'] {
-            background-color: #ffec9f;
-            color: #333;
-            justify-self: start;
-          }
+    button[type='submit'] {
+      background-color: #ffec9f;
+      color: #333;
+      justify-self: start;
+    }
 
-          button[type='button'] {
-            background-color: #e3e4f1;
-            color: #333;
-            justify-self: end;
-          }
+    button[type='button'] {
+      background-color: #e3e4f1;
+      color: #333;
+      justify-self: end;
+    }
 
-          /* Alineación interna para que parezcan centrados */
-          &>button:first-child {
-            margin-left: auto;
-            margin-right: 1rem;
-          }
+    /* Alineación interna para que parezcan centrados */
+    &>button:first-child {
+      margin-left: auto;
+      margin-right: 1rem;
+    }
 
-          &>button:last-child {
-            margin-right: auto;
-            margin-left: 1rem;
-          }
+    &>button:last-child {
+      margin-right: auto;
+      margin-left: 1rem;
+    }
 
-          button[disabled] {
-            opacity: 0.6;
-            cursor: not-allowed;
-          }
-        }
+    button[disabled] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 }
