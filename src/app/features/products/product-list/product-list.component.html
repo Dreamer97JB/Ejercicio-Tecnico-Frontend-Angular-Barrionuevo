@@ -11,8 +11,15 @@
     <button routerLink="/add" class="add-button">Agregar</button>
   </div>
 
-  <div *ngIf="loading">
-    <p>Cargando productos...</p>
+  <div *ngIf="loading" class="skeleton-table">
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+      <div class="skeleton-cell skeleton-img"></div>
+      <div class="skeleton-cell skeleton-text"></div>
+      <div class="skeleton-cell skeleton-text"></div>
+      <div class="skeleton-cell skeleton-date"></div>
+      <div class="skeleton-cell skeleton-date"></div>
+      <div class="skeleton-cell skeleton-menu"></div>
+    </div>
   </div>
 
   <table

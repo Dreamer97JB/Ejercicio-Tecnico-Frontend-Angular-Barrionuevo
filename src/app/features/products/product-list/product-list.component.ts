@@ -52,9 +52,11 @@ export class ProductListComponent implements OnInit {
   ngOnInit(): void {
     this.productService.getProducts().subscribe({
       next: (data) => {
-        this.allProducts = data;
-        this.filteredProducts = data;
-        this.loading = false;
+        setTimeout(() => {
+          this.allProducts = data;
+          this.filteredProducts = data;
+          this.loading = false;
+        }, 2000);
       },
       error: (err) => {
         console.error('Error loading products', err);
