@@ -7,7 +7,7 @@ import { FinancialProduct } from '../models/financial-product.model';
   providedIn: 'root',
 })
 export class ProductService {
-  private readonly baseUrl = 'http://localhost:3002/bp/products';
+  private readonly baseUrl = '/bp/products';
 
   constructor(private http: HttpClient) { }
 
