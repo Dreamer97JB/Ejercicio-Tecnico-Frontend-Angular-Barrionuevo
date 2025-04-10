@@ -31,6 +31,7 @@ export class LoginComponent {
       password: ['', [Validators.required]],
     });
   }
+  
 
   login(): void {
     if (this.form.invalid) return;

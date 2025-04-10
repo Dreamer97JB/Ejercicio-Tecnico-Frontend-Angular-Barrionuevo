@@ -27,7 +27,16 @@ export class AuthService {
     return localStorage.getItem('access_token');
   }
 
+  getRole(): string | null {
+    return localStorage.getItem('user_role');
+  }
+
+  isAuthenticated(): boolean {
+    return !!this.getToken();
+  }
+
   logout() {
     localStorage.removeItem('access_token');
+    localStorage.removeItem('user_role');
   }
 }

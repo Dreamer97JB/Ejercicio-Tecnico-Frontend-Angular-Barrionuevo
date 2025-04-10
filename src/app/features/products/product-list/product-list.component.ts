@@ -49,6 +49,10 @@ export class ProductListComponent implements OnInit {
     private snackbar: SnackbarService
   ) { }
 
+  get isAdmin(): boolean {
+    return localStorage.getItem('user_role') === 'admin';
+  }
+  
   ngOnInit(): void {
     this.productService.getProducts().subscribe({
       next: (data) => {
