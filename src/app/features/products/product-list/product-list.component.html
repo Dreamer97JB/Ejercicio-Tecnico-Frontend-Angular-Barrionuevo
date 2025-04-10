@@ -8,7 +8,8 @@
       placeholder="Buscar Productos Financieros..."
       class="search-input"
     />
-    <button routerLink="/add" class="add-button">Agregar</button>
+    <button *ngIf="isAdmin" routerLink="/add" class="add-button">Agregar</button>
+
   </div>
 
   <div *ngIf="loading" class="skeleton-table">
@@ -49,7 +50,7 @@
             Fecha de reestructuración <span class="material-symbols-outlined info-circle">info</span>
           </div>
         </th>
-        <th></th>
+        <th *ngIf="isAdmin"></th>
       </tr>
     </thead>
 
@@ -62,7 +63,7 @@
         <td>{{ product.description }}</td>
         <td>{{ product.date_release | date:'dd-MM-yyyy' }}</td>
         <td>{{ product.date_revision | date:'dd-MM-yyyy'}}</td>
-        <td class="menu-wrapper">
+        <td class="menu-wrapper" *ngIf="isAdmin">
           <button (click)="toggleMenu(product.id)" class="menu-button">
             ⋮
           </button>

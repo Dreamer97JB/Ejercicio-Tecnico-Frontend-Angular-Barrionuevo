@@ -13,8 +13,7 @@ export class ProductService {
 
   getProducts(): Observable<FinancialProduct[]> {
     return this.http.get<{ data: FinancialProduct[] }>(this.baseUrl).pipe(
-      // Extract only the data array
-      map(response => response.data)
+        map(response => response.data)
     );
   }
 
